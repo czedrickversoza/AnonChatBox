@@ -70,6 +70,7 @@ function register() {
 }
 
 
+
 function logout(){
   auth.signOut()
   .then(function() {
@@ -156,7 +157,33 @@ function login(){
 });
 }
 
-function showMsg()
+function showMsg() {
+  try {
+    var kdata_ref = database.ref("messages");
+
+    kdata_ref.orderByChild('time_sent').once('value', function(snapshot) {
+      $("#msg-boxes").empty(); // Clear previous messages
+      snapshot.forEach(function(childSnapshot) {
+        // Access each message
+        var message = childSnapshot.val();
+        var cls = "theirMessage";
+        if (message.uid == auth.currentUser.uid) {
+          cls = "myMessage";
+        }
+        // Do something with the message
+        var ndiv = $(`<div class="col ${cls}"><h1 class="fs-6 fw-semibold">${message.username}</h1><p class="fw-light">${message.message}</p><p class="fw-light" style="font-size: 12px;">${timeAgo(message.time_sent)}</p></div>`);
+        $("#msg-boxes").append(ndiv);
+      });
+    }).catch(function(error) {
+      console.error('Error retrieving messages:', error);
+    });
+  } catch (error) {
+    console.error('Error in showMsg:', error);
+  }
+}
+
+
+function shomsg()
 {
   try{
   var kdata_ref = database.ref("messages");
@@ -170,7 +197,11 @@ function showMsg()
         cls = "myMessage";
       }
       // Do something with the message
-      document.getElementById("msg-boxes").innerHTML+=`<div class="col ${cls}"><h1 class="fs-6 fw-semibold">${message.username}</h1><p class="fw-light">${message.message}</p><p class="fw-light" style="font-size: 12px;">${timeAgo(message.time_sent)}</p></div>`;
+      var ndiv = $(`<div class="col ${cls}"><h1 class="fs-6 fw-semibold">${message.username}</h1><p class="fw-light">${message.message}</p><p class="fw-light" style="font-size: 12px;">${timeAgo(message.time_sent)}</p></div>`);
+      //document.getElementById("msg-boxes").innerHTML+=`<div class="col ${cls}"><h1 class="fs-6 fw-semibold">${message.username}</h1><p class="fw-light">${message.message}</p><p class="fw-light" style="font-size: 12px;">${timeAgo(message.time_sent)}</p></div>`;
+      $(document).ready(function() {
+        $("#msg-boxes").append(ndiv);
+      });
     });
   }).catch(function(error) {
     console.error('Error retrieving messages:', error);
