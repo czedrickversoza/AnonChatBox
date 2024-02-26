@@ -131,6 +131,7 @@ function login(){
         }
         
         mdata_ref.child('messages/').push(msg_data);
+        showMsg2();
       });
     });
 
@@ -157,9 +158,9 @@ function login(){
 });
 }
 
-function showMsg() {
+function showMsg2() {
   try {
-    var kdata_ref = database.ref("messages");
+    var kdata_ref = database.ref("messages").limitToFirst(10);
 
     kdata_ref.orderByChild('time_sent').once('value', function(snapshot) {
       $("#msg-boxes").empty(); // Clear previous messages
@@ -183,14 +184,15 @@ function showMsg() {
 }
 
 
-function shomsg()
+function showMsg()
 {
   try{
-  var kdata_ref = database.ref("messages");
-
+  var kdata_ref = database.ref("messages").limitToFirst(5);
+  
     kdata_ref.orderByChild('time_sent').once('value', function(snapshot) {
-    snapshot.forEach(function(childSnapshot) {
+      snapshot.forEach(function(childSnapshot) {
       // Access each message
+
       var message = childSnapshot.val();
       var cls = "theirMessage";
       if(message.uid == auth.currentUser.uid){
